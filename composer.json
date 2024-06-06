@@ -12,7 +12,7 @@
 	],
 	"autoload": {
 		"psr-4": {
-			"TheoD02\\Castor\\Runner": "./src/"
+			"TheoD02\\Castor\\Runner\\": "./src/"
 		},
 		"files": [
 			"./src/functions.php",
