@@ -1,16 +1,20 @@
-# Castor Docker Runner Library Documentation
+# Castor Docker Runner Library
 
-## Overview
+The `castor-docker-runner` is a PHP library designed to facilitate the execution of commands, particularly within Docker containers. This library is usable with the Castor project.
 
-The `castor-docker-runner` is a PHP library designed to facilitate the execution of commands, particularly within Docker
-containers or not.
+## Table of Contents
 
-It is usable with Castor project and is primarily composed of two traits: `RunnerTrait` and `DockerRunnerTrait`, which
-are used in the `DockerRunner` class.
+- [Installation](#installation)
+- [Usage](#usage)
+  - [RunnerTrait](#runnertrait)
+  - [DockerRunnerTrait](#dockerrunnertrait)
+- [API Reference](#api-reference)
+- [Contribution](#contribution)
+- [License](#license)
 
 ## Installation
 
-To install the library, you can use Composer with castor:
+To install the library, use Composer with the following command:
 
 ```bash
 castor composer require castor/castor-docker-runner
@@ -20,15 +24,7 @@ castor composer require castor/castor-docker-runner
 
 ### RunnerTrait
 
-The `RunnerTrait` is a trait that provides some methods to execute commands. Let's take this one like a builder for
-running commands.
-
-This one didn't add really much to the `run` function of the one provided by `castor` but it adds some useful methods to
-build the command.
-
-#### Example
-
-Make a runner for Composer:
+The `RunnerTrait` provides methods to execute commands. It acts as a builder for running commands. Here's an example of how to use it:
 
 ```php
 use Castor\Runner\RunnerTrait;
@@ -47,29 +43,9 @@ $runner = new MyRunner();
 $runner->add('install')->run(); // Run the command "composer install"
 ```
 
-At this point, what the hell ? Why not just use `castor` ?
-
-But you can do more with this trait, like adding options, arguments with conditions, etc.
-
-#### Example
-
-```php
-$runner
-    ->add('require', 'vendor/package')
-    ->addIf($devMode, '--dev') // Add the option "--dev" if $devMode is true
-    ->run(); // If $devMode is true, run the command "composer require vendor/package --dev" else "composer require vendor/package"
-```
-
-But not really interesting, right ? Let's see the `DockerRunnerTrait`.
-
 ### DockerRunnerTrait
 
-The `DockerRunnerTrait` is a trait that provides some methods to execute commands within a Docker container. Based on
-the `RunnerTrait`, it adds some methods to build the command with Docker options.
-
-#### Example
-
-Make a runner for Symfony console:
+The `DockerRunnerTrait` provides methods to execute commands within a Docker container. It adds methods to build the command with Docker options. Here's an example of how to use it:
 
 ```php
 use Castor\Runner\DockerRunnerTrait;
@@ -82,11 +58,7 @@ class SymfonyRunner
     }
     use DockerRunnerTrait;
 
-    public function __construct(
-        private readonly string $appId = 'tenants',
-        private readonly string $tenant = 'EFF',
-        ?Context                $castorContext = null,
-    )
+    public function __construct(?Context $castorContext = null)
     {
         $this->__runnerTraitConstruct($castorContext);
     }
@@ -116,25 +88,21 @@ $sfRunner
     ->run(); // Run the command "docker-compose exec -T my-container-compose-name php bin/console cache:clear --env=prod"
 ```
 
-Ok, now it's more interesting. You can run commands within a Docker container with this trait.
+The `DockerRunnerTrait` provides a significant advantage when running scripts in different environments. It allows you to execute commands within a Docker container, and it intelligently determines whether the script is being run from the host or from within a Docker container.
 
-But the big advantage is if you run castor script from Host, it will run the command in docker container by
-using `docker exec`.
-If you run castor script from Docker container, it will run the command directly in the container without `docker exec`.
-
-In the current case if you run the script from Host, it will run the command:
+When the script is run from the host, the command is executed in the Docker container using `docker exec`. For example, if you run the script from the host, it will execute the following command:
 
 ```bash
 docker exec -it --workdir /app --user www-data my-container-name php bin/console cache:clear --env=prod
 ```
 
-And if you run the script from Docker container, it will run the command:
+However, if the script is run from within a Docker container, the command is executed directly in the container without the need for `docker exec`. In this case, the following command will be executed:
 
 ```bash
 php bin/console cache:clear --env=prod
 ```
 
-By default if you don't use this library you will have to do something like this:
+This feature simplifies the command execution process and makes your code cleaner and more maintainable. Without this library, you would have to manually check if the script is running inside a Docker container and then construct the command accordingly, as shown in the following example:
 
 ```php
 $runningInDocker = file_exists('/.dockerenv');
@@ -147,3 +115,16 @@ if ($runningInDocker) {
 
 run($command);
 ```
+
+With the `DockerRunnerTrait`, this process is abstracted away, allowing you to focus on the logic of your application rather than the specifics of command execution.
+
+## API Reference
+
+- `RunnerTrait`: This trait provides methods to execute commands.
+- `DockerRunnerTrait`: This trait provides methods to execute commands within a Docker container.
+- `DockerRunner`: This class uses the `RunnerTrait` to execute Docker commands.
+- `DockerUtils`: This class provides utility methods for Docker, such as checking if the current environment is inside a Docker container, checking if certain Docker containers are running, checking if a Docker image exists, and checking if a Docker network exists.
+
+## Contribution
+
+If you'd like to contribute to this project, please feel free to fork the repository, make your changes, and submit a pull request.
