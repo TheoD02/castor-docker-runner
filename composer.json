@@ -1,0 +1,22 @@
+{
+	"name": "theod02/castor-docker-runner",
+	"description": "A docker runner for Castor (This will be used to run Castor in a docker container or run the same commands when running inside a container)",
+	"type": "castor-project",
+	"license": "MIT",
+	"minimum-stability": "dev",
+	"authors": [
+		{
+			"name": "Theo D",
+			"email": "theo.d02290@gmail.com"
+		}
+	],
+	"autoload": {
+		"psr-4": {
+			"TheoD02\\Castor\\Runner": "./src/"
+		},
+		"files": [
+			"./src/functions.php",
+			"./castor.php"
+		]
+	}
+}
